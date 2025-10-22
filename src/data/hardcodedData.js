@@ -122,43 +122,63 @@ export const users = [
   // Employees
   {
     id: 12,
-    name: "Tara",
+    name: "Tara Singh",
     email: "tara@abstractgroup.com",
     password: "123",
     role: "employee",
-    department: "Operations"
+    department: "Operations",
+    phone: "+91 98765-43220",
+    location: "Mumbai, India",
+    employeeId: "EMP-2023-012",
+    reportsTo: "Deepak Kumar"
   },
   {
     id: 13,
-    name: "Alex",
+    name: "Alex Johnson",
     email: "alex@abstractgroup.com",
     password: "123",
     role: "employee",
-    department: "Operations"
+    department: "Operations",
+    phone: "+91 98765-43221",
+    location: "Mumbai, India",
+    employeeId: "EMP-2023-013",
+    reportsTo: "Deepak Kumar"
   },
   {
     id: 14,
-    name: "Radha",
+    name: "Radha Sharma",
     email: "radha@abstractgroup.com",
     password: "123",
     role: "employee",
-    department: "Operations"
+    department: "Operations",
+    phone: "+91 98765-43222",
+    location: "Mumbai, India",
+    employeeId: "EMP-2023-014",
+    reportsTo: "Kavita Verma"
   },
   {
     id: 15,
-    name: "Neha",
+    name: "Neha Gupta",
     email: "neha@abstractgroup.com",
     password: "123",
     role: "employee",
-    department: "Operations"
+    department: "Operations",
+    phone: "+91 98765-43223",
+    location: "Mumbai, India",
+    employeeId: "EMP-2023-015",
+    reportsTo: "Kavita Verma"
   },
   {
     id: 16,
-    name: "Priya",
+    name: "Priya Patel",
     email: "priya@abstractgroup.com",
     password: "123",
     role: "employee",
-    department: "Operations"
+    department: "Operations",
+    phone: "+91 98765-43224",
+    location: "Mumbai, India",
+    employeeId: "EMP-2023-016",
+    reportsTo: "Simran Patel"
   }
 ];
 
