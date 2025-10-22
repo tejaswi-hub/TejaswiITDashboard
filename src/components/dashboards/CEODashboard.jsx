@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAppState } from '../../contexts/AppStateContext';
 import Header from '../shared/Header';
+import api from "../../Connection/Api";
 import Sidebar from '../shared/Sidebar';
 import TicketTable from '../shared/TicketTable';
 import EnhancedTicketModal from '../shared/EnhancedTicketModal';

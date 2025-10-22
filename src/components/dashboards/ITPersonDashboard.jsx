@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppState } from '../../contexts/AppStateContext';
+import api from "../../Connection/Api";
 import Header from '../shared/Header';
 import Sidebar from '../shared/Sidebar';
 import TicketTable from '../shared/TicketTable';
@@ -42,7 +43,9 @@ import {
   UserCheck,
   Building,
   Tag,
-  Flag
+  Flag,
+  Upload,
+  Image
 } from 'lucide-react';
 
 const ITPersonDashboard = () => {
@@ -95,6 +98,8 @@ const ITPersonDashboard = () => {
     description: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Stateful data for demonstration - these will be updated dynamically
   const [agents, setAgents] = useState([
@@ -390,6 +395,24 @@ const ITPersonDashboard = () => {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
   const validateTicketForm = () => {
     const errors = {};
     
@@ -424,7 +447,8 @@ const ITPersonDashboard = () => {
       subject: ticketForm.subject,
       priority: ticketForm.priority,
       createdBy: ticketForm.fullName,
-      description: ticketForm.description
+      description: ticketForm.description,
+      image: imageFile ? imageFile.name : null
     };
     
     // Add to tickets using CRUD operation
@@ -441,6 +465,8 @@ const ITPersonDashboard = () => {
       description: ''
     });
     setFormErrors({});
+    setImageFile(null);
+    setImagePreview(null);
     
     alert('Ticket created successfully!');
   };
@@ -456,6 +482,8 @@ const ITPersonDashboard = () => {
       description: ''
     });
     setFormErrors({});
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleViewChange = (view) => {
@@ -1762,6 +1790,74 @@ const ITPersonDashboard = () => {
                       )}
                     </div>
                   </div>
+                  
+                  {/* Image Upload Section - Added before description */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Attach Image (Optional)
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                      {imagePreview ? (
+                        <div className="space-y-4">
+                          <div className="mx-auto max-w-xs">
+                            <img 
+                              src={imagePreview} 
+                              alt="Preview" 
+                              className="w-full h-auto rounded-lg shadow-sm"
+                            />
+                          </div>
+                          <div className="flex items-center justify-center space-x-4">
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById('image-upload').click()}
+                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                            >
+                              <Upload className="h-4 w-4" />
+                              <span>Change Image</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={removeImage}
+                              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+                            >
+                              <X className="h-4 w-4" />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="flex justify-center">
+                            <Image className="h-12 w-12 text-gray-400" />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-2">
+                              Drag and drop an image here, or click to browse
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById('image-upload').click()}
+                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 mx-auto"
+                            >
+                              <Upload className="h-4 w-4" />
+                              <span>Upload Image</span>
+                            </button>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            Supports: JPG, PNG, GIF (Max 5MB)
+                          </p>
+                        </div>
+                      )}
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Description <span className="text-red-500">*</span>
@@ -2405,4 +2501,3 @@ const ITPersonDashboard = () => {
 };
 
 export default ITPersonDashboard;
-
