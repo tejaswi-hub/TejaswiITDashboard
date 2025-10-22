@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import api from "../../Connection/Api";
 import { useAppState } from '../../contexts/AppStateContext';
 import Header from '../shared/Header';
 import Sidebar from '../shared/Sidebar';
