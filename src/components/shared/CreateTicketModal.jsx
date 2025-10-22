@@ -10,7 +10,8 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
     category: '',
     subcategory: '',
     description: '',
-    priority: 'medium'
+    priority: 'medium',
+    image: null // 👈 added image field
   });
 
   const [errors, setErrors] = useState({});
@@ -22,7 +23,6 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -34,7 +34,6 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.category) newErrors.category = 'Category is required';
@@ -57,18 +56,19 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
       department: user.department,
       assignedL1: null,
       assignedL2: null,
-      estimatedHours: formData.priority === 'high' ? 4 : formData.priority === 'medium' ? 2 : 1
+      estimatedHours: formData.priority === 'high' ? 4 : formData.priority === 'medium' ? 2 : 1,
+      image: formData.image // 👈 added image in ticket data
     };
 
     actions.createTicket(newTicket);
     
-    // Reset form
     setFormData({
       title: '',
       category: '',
       subcategory: '',
       description: '',
-      priority: 'medium'
+      priority: 'medium',
+      image: null
     });
     setErrors({});
     onClose();
@@ -94,7 +94,7 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Employee Info (Read-only) */}
+          {/* Employee Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -192,6 +192,29 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
             </select>
           </div>
 
+          {/* 👇 Image Upload Column (Before Description) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Attach Image (optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  image: e.target.files[0],
+                }))
+              }
+              className="input-field"
+            />
+            {formData.image && (
+              <p className="mt-1 text-sm text-gray-600">
+                Selected: {formData.image.name}
+              </p>
+            )}
+          </div>
+
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -234,4 +257,3 @@ const CreateTicketModal = ({ isOpen, onClose }) => {
 };
 
 export default CreateTicketModal;
-

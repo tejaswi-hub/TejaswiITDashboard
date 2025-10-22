@@ -52,6 +52,11 @@ const COODashboard = () => {
   // Approval states
   const [selectedApprovalTicket, setSelectedApprovalTicket] = useState(null);
   const [showApprovalDetails, setShowApprovalDetails] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [approvalNotes, setApprovalNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [approvalQueueData, setApprovalQueueData] = useState([]);
   
   // Ref for profile dropdown
   const profileDropdownRef = useRef(null);
@@ -95,7 +100,6 @@ const COODashboard = () => {
 
   // Calculate comprehensive KPIs
   const kpis = useMemo(() => {
-    const totalTickets = 1240; // Mock data to match the design
     const pendingApprovals = 12;
     const closedThisWeek = 326;
     const slaCompliance = 92;
@@ -103,12 +107,13 @@ const COODashboard = () => {
 
     return [
       {
-        title: 'Total Tickets',
-        value: totalTickets.toLocaleString(),
-        icon: Users,
-        trend: '+10%',
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        title: 'Tickets Closed This Week',
+        value: closedThisWeek,
+        icon: CheckCircle,
+        trend: '+115%',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100',
+        cardBgColor: 'bg-green-50'
       },
       {
         title: 'Pending Approvals',
@@ -116,101 +121,312 @@ const COODashboard = () => {
         icon: Bell,
         trend: null,
         color: 'text-orange-600',
-        bgColor: 'bg-orange-50'
-      },
-      {
-        title: 'Tickets Closed This Week',
-        value: closedThisWeek,
-        icon: CheckCircle,
-        trend: '+115%',
-        color: 'text-green-600',
-        bgColor: 'bg-green-50'
+        bgColor: 'bg-orange-100',
+        cardBgColor: 'bg-orange-50'
       },
       {
         title: 'SLA Compliance',
         value: `${slaCompliance}%`,
         icon: CheckCircle,
         trend: null,
-        color: 'text-green-600',
-        bgColor: 'bg-green-50'
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-100',
+        cardBgColor: 'bg-blue-50'
       },
       {
         title: 'Avg Resolution Time',
         value: avgResolutionTime,
         icon: Clock,
         trend: null,
-        color: 'text-gray-600',
-        bgColor: 'bg-gray-50'
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-100',
+        cardBgColor: 'bg-purple-50'
       }
     ];
   }, []);
 
-  // Updated ticket data matching the image
+  // Updated ticket data matching the image with enhanced details for modal
   const ticketData = [
     {
       id: 'TCK-2025-0305',
+      title: 'Software Access Request - CRM System',
       department: 'IT',
       issueType: 'Software Access',
+      category: 'Software',
+      subcategory: 'Access Request',
       priority: 'High',
       status: 'Awaiting Approval',
       assignedLevel: 'L2 Manager',
+      assignedTo: 'Deepak Sharma',
       slaStatus: 'On Track',
-      lastUpdated: '2025-10-18 09:15'
+      lastUpdated: '2025-10-18 09:15',
+      createdBy: 'Tara Singh',
+      createdByEmail: 'tara.singh@abstractgroup.com',
+      description: 'Request for CRM system access for 5 new employees in the sales department. This requires approval for software licensing and user account creation.',
+      workingTeam: ['Deepak Sharma', 'Amit Patel'],
+      hoursLogged: 2.5,
+      estimatedHours: 8,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Tara Singh',
+          comment: 'Created ticket for CRM access request',
+          timestamp: '2025-10-16T09:00:00Z'
+        },
+        {
+          id: 2,
+          action: 'Assigned',
+          user: 'Deepak Sharma',
+          comment: 'Assigned to L2 Manager for review',
+          timestamp: '2025-10-16T10:30:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Tara Singh',
+          content: 'Need access for 5 new sales team members',
+          timestamp: '2025-10-16T09:00:00Z'
+        },
+        {
+          id: 2,
+          author: 'Deepak Sharma',
+          content: 'Reviewing licensing requirements',
+          timestamp: '2025-10-16T10:30:00Z'
+        }
+      ]
     },
     {
       id: 'TCK-2025-0304',
+      title: 'HR Policy Change Request',
       department: 'HR',
       issueType: 'Policy Change',
+      category: 'Policy',
+      subcategory: 'HR Policy',
       priority: 'Medium',
       status: 'In Progress',
       assignedLevel: 'L1 Manager',
+      assignedTo: 'Kavita Desai',
       slaStatus: 'On Track',
-      lastUpdated: '2025-10-17 16:30'
+      lastUpdated: '2025-10-17 16:30',
+      createdBy: 'Neha Gupta',
+      createdByEmail: 'neha.gupta@abstractgroup.com',
+      description: 'Request to update remote work policy to include new guidelines for hybrid work arrangements.',
+      workingTeam: ['Kavita Desai'],
+      hoursLogged: 4,
+      estimatedHours: 12,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Neha Gupta',
+          comment: 'Created policy change request',
+          timestamp: '2025-10-15T14:00:00Z'
+        },
+        {
+          id: 2,
+          action: 'Assigned',
+          user: 'Kavita Desai',
+          comment: 'Assigned to HR Manager for review',
+          timestamp: '2025-10-15T15:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Neha Gupta',
+          content: 'Need to update policy for hybrid work',
+          timestamp: '2025-10-15T14:00:00Z'
+        }
+      ]
     },
     {
       id: 'TCK-2025-0303',
+      title: 'Budget Approval for Hardware Purchase',
       department: 'Finance',
       issueType: 'Budget Approval',
+      category: 'Finance',
+      subcategory: 'Budget Request',
       priority: 'Critical',
       status: 'Awaiting Approval',
       assignedLevel: 'COO',
+      assignedTo: 'Rashmi Desai',
       slaStatus: 'At Risk',
-      lastUpdated: '2025-10-17 11:20'
+      lastUpdated: '2025-10-17 11:20',
+      createdBy: 'Raj Kumar',
+      createdByEmail: 'raj.kumar@abstractgroup.com',
+      description: 'Budget approval needed for $25,000 hardware purchase for design team laptops with high-end graphics cards.',
+      workingTeam: ['Rashmi Desai'],
+      hoursLogged: 1,
+      estimatedHours: 4,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Raj Kumar',
+          comment: 'Created budget approval request',
+          timestamp: '2025-10-14T11:00:00Z'
+        },
+        {
+          id: 2,
+          action: 'Escalated',
+          user: 'Amit Patel',
+          comment: 'Escalated to COO for budget approval',
+          timestamp: '2025-10-14T16:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Raj Kumar',
+          content: 'Urgent budget approval needed for design team',
+          timestamp: '2025-10-14T11:00:00Z'
+        }
+      ]
     },
     {
       id: 'TCK-2025-0302',
+      title: 'Network Infrastructure Issue',
       department: 'IT',
       issueType: 'Network Issue',
+      category: 'Infrastructure',
+      subcategory: 'Network',
       priority: 'High',
       status: 'In Progress',
       assignedLevel: 'IT Manager',
+      assignedTo: 'Suresh Kumar',
       slaStatus: 'On Track',
-      lastUpdated: '2025-10-17 10:45'
+      lastUpdated: '2025-10-17 10:45',
+      createdBy: 'Priya Sharma',
+      createdByEmail: 'priya.sharma@abstractgroup.com',
+      description: 'Network connectivity issues affecting multiple departments. Intermittent connection drops reported.',
+      workingTeam: ['Suresh Kumar', 'Amit Patel'],
+      hoursLogged: 6,
+      estimatedHours: 16,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Priya Sharma',
+          comment: 'Reported network connectivity issues',
+          timestamp: '2025-10-16T08:00:00Z'
+        },
+        {
+          id: 2,
+          action: 'Assigned',
+          user: 'Suresh Kumar',
+          comment: 'Assigned to IT Manager for investigation',
+          timestamp: '2025-10-16T09:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Priya Sharma',
+          content: 'Network keeps dropping every few minutes',
+          timestamp: '2025-10-16T08:00:00Z'
+        }
+      ]
     },
     {
       id: 'TCK-2025-0301',
+      title: 'Employee Access Request',
       department: 'Admin',
       issueType: 'Access Request',
+      category: 'Access',
+      subcategory: 'User Access',
       priority: 'Low',
       status: 'Resolved',
       assignedLevel: 'L1 Manager',
+      assignedTo: 'Kavita Desai',
       slaStatus: 'Completed',
-      lastUpdated: '2025-10-16 17:00'
+      lastUpdated: '2025-10-16 17:00',
+      createdBy: 'Amit Singh',
+      createdByEmail: 'amit.singh@abstractgroup.com',
+      description: 'New employee needs access to company systems and shared drives.',
+      workingTeam: ['Kavita Desai'],
+      hoursLogged: 3,
+      estimatedHours: 4,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Amit Singh',
+          comment: 'Created access request for new employee',
+          timestamp: '2025-10-15T10:00:00Z'
+        },
+        {
+          id: 2,
+          action: 'Assigned',
+          user: 'Kavita Desai',
+          comment: 'Assigned to Admin Manager',
+          timestamp: '2025-10-15T11:00:00Z'
+        },
+        {
+          id: 3,
+          action: 'Resolved',
+          user: 'Kavita Desai',
+          comment: 'Access granted successfully',
+          timestamp: '2025-10-16T17:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Amit Singh',
+          content: 'New employee John Doe needs system access',
+          timestamp: '2025-10-15T10:00:00Z'
+        },
+        {
+          id: 2,
+          author: 'Kavita Desai',
+          content: 'Access has been provisioned',
+          timestamp: '2025-10-16T17:00:00Z'
+        }
+      ]
     },
     {
       id: 'TCK-2025-0300',
+      title: 'Hardware Replacement Request',
       department: 'IT',
       issueType: 'Hardware',
+      category: 'Hardware',
+      subcategory: 'Replacement',
       priority: 'Medium',
       status: 'Created',
       assignedLevel: 'Unassigned',
+      assignedTo: null,
       slaStatus: 'On Track',
-      lastUpdated: '2025-10-16 14:20'
+      lastUpdated: '2025-10-16 14:20',
+      createdBy: 'Ravi Verma',
+      createdByEmail: 'ravi.verma@abstractgroup.com',
+      description: 'Request for replacement of faulty laptop keyboard and trackpad.',
+      workingTeam: [],
+      hoursLogged: 0,
+      estimatedHours: 2,
+      historyLog: [
+        {
+          id: 1,
+          action: 'Ticket Created',
+          user: 'Ravi Verma',
+          comment: 'Created hardware replacement request',
+          timestamp: '2025-10-16T14:20:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 1,
+          author: 'Ravi Verma',
+          content: 'Laptop keyboard and trackpad not working properly',
+          timestamp: '2025-10-16T14:20:00Z'
+        }
+      ]
     }
   ];
 
-  // Mock data for approval queue
-  const approvalQueue = [
+  // Mock data for approval queue - 10 items
+  const initialApprovalQueue = [
     {
       id: 'TCK-2025-0301',
       raisedBy: 'Tara',
@@ -254,6 +470,72 @@ const COODashboard = () => {
       department: 'IT',
       dateRaised: '2025-10-13',
       slaDeadline: '2025-10-20'
+    },
+    {
+      id: 'TCK-2025-0306',
+      raisedBy: 'Alex',
+      currentHandler: 'Rohan (L2)',
+      summary: 'Budget approval for software licenses',
+      priority: 'Medium',
+      details: 'Annual software license renewal for Microsoft Office 365 and Adobe Creative Suite. Total cost $15,000.',
+      department: 'IT',
+      dateRaised: '2025-10-12',
+      slaDeadline: '2025-10-19'
+    },
+    {
+      id: 'TCK-2025-0307',
+      raisedBy: 'Radha',
+      currentHandler: 'Simran (L1)',
+      summary: 'Office equipment purchase request',
+      priority: 'Low',
+      details: 'Request to purchase new office chairs and desks for the new office space. Budget $8,500.',
+      department: 'Admin',
+      dateRaised: '2025-10-11',
+      slaDeadline: '2025-10-21'
+    },
+    {
+      id: 'TCK-2025-0308',
+      raisedBy: 'Vikas',
+      currentHandler: 'Deepak (L1)',
+      summary: 'Security software upgrade',
+      priority: 'High',
+      details: 'Upgrade to latest antivirus and security software across all company devices. One-time cost $12,000.',
+      department: 'IT',
+      dateRaised: '2025-10-10',
+      slaDeadline: '2025-10-18'
+    },
+    {
+      id: 'TCK-2025-0309',
+      raisedBy: 'Sneha',
+      currentHandler: 'Kavita (L1)',
+      summary: 'Training program approval',
+      priority: 'Medium',
+      details: 'Approval for team training program on new project management tools. Cost $5,000 for 20 employees.',
+      department: 'HR',
+      dateRaised: '2025-10-09',
+      slaDeadline: '2025-10-22'
+    },
+    {
+      id: 'TCK-2025-0310',
+      raisedBy: 'Amit',
+      currentHandler: 'Rohan (L2)',
+      summary: 'Server hardware upgrade',
+      priority: 'Critical',
+      details: 'Critical server hardware upgrade needed to handle increased load. Budget $35,000 for new servers.',
+      department: 'IT',
+      dateRaised: '2025-10-08',
+      slaDeadline: '2025-10-16'
+    },
+    {
+      id: 'TCK-2025-0311',
+      raisedBy: 'Neha',
+      currentHandler: 'Simran (L1)',
+      summary: 'Marketing campaign budget',
+      priority: 'Medium',
+      details: 'Q4 marketing campaign budget approval for digital advertising and content creation. Total $20,000.',
+      department: 'Marketing',
+      dateRaised: '2025-10-07',
+      slaDeadline: '2025-10-23'
     }
   ];
 
@@ -303,27 +585,51 @@ const COODashboard = () => {
   };
 
   const handleApprove = (ticketId) => {
-    const ticket = approvalQueue.find(t => t.id === ticketId);
+    const ticket = approvalQueueData.find(t => t.id === ticketId);
     setSelectedApprovalTicket(ticket);
-    setShowApprovalDetails(true);
-    // Simulate approval
-    setTimeout(() => {
-    alert(`Ticket ${ticketId} approved successfully!`);
-      setShowApprovalDetails(false);
-      setSelectedApprovalTicket(null);
-    }, 1000);
+    setShowApproveModal(true);
   };
 
-  const handleReject = (ticketId) => {
-    const ticket = approvalQueue.find(t => t.id === ticketId);
+  const handleDrop = (ticketId) => {
+    const ticket = approvalQueueData.find(t => t.id === ticketId);
     setSelectedApprovalTicket(ticket);
-    setShowApprovalDetails(true);
-    // Simulate rejection
-    setTimeout(() => {
-    alert(`Ticket ${ticketId} rejected.`);
-      setShowApprovalDetails(false);
+    setShowRejectModal(true);
+  };
+
+  const handleConfirmApproval = () => {
+    if (selectedApprovalTicket) {
+      // Here you would typically make an API call to approve the ticket
+      console.log(`Approving ticket ${selectedApprovalTicket.id} with notes: ${approvalNotes}`);
+      
+      // Remove the approved ticket from the queue
+      setApprovalQueueData(prevQueue => 
+        prevQueue.filter(ticket => ticket.id !== selectedApprovalTicket.id)
+      );
+      
+      alert(`Ticket ${selectedApprovalTicket.id} approved successfully!`);
+      setShowApproveModal(false);
       setSelectedApprovalTicket(null);
-    }, 1000);
+      setApprovalNotes('');
+    }
+  };
+
+  const handleConfirmDrop = () => {
+    if (selectedApprovalTicket && rejectionReason.trim()) {
+      // Here you would typically make an API call to drop the ticket
+      console.log(`Dropping ticket ${selectedApprovalTicket.id} with reason: ${rejectionReason}`);
+      
+      // Remove the dropped ticket from the queue
+      setApprovalQueueData(prevQueue => 
+        prevQueue.filter(ticket => ticket.id !== selectedApprovalTicket.id)
+      );
+      
+      alert(`Ticket ${selectedApprovalTicket.id} dropped.`);
+      setShowRejectModal(false);
+      setSelectedApprovalTicket(null);
+      setRejectionReason('');
+    } else {
+      alert('Please provide a reason for dropping.');
+    }
   };
   
   const handleLogout = () => {
@@ -351,6 +657,11 @@ const COODashboard = () => {
     });
   }, [departmentFilter, statusFilter, priorityFilter]);
   
+  // Initialize approval queue data
+  useEffect(() => {
+    setApprovalQueueData(initialApprovalQueue);
+  }, []);
+
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -367,6 +678,92 @@ const COODashboard = () => {
 
   const handleExport = (format, type) => {
     console.log(`Exporting ${type} as ${format}`);
+    
+    if (format === 'csv') {
+      // Generate CSV data based on type
+      let csvData = '';
+      let filename = '';
+      
+      if (type === 'SLA Report') {
+        csvData = 'Department,SLA Compliance,Avg Closure Time,Tickets Breached,Total Tickets\n';
+        slaData.forEach(dept => {
+          csvData += `${dept.department},${dept.slaCompliance}%,${dept.avgClosureTime},${dept.ticketsBreached},${dept.totalTickets}\n`;
+        });
+        filename = 'sla_report.csv';
+      } else if (type === 'Complete Ticket Report') {
+        csvData = 'Ticket ID,Department,Issue Type,Priority,Status,Assigned Level,SLA Status,Last Updated\n';
+        ticketData.forEach(ticket => {
+          csvData += `${ticket.id},${ticket.department},${ticket.issueType},${ticket.priority},${ticket.status},${ticket.assignedLevel},${ticket.slaStatus},${ticket.lastUpdated}\n`;
+        });
+        filename = 'complete_ticket_report.csv';
+      } else if (type === 'Approval Queue Report') {
+        csvData = 'Ticket ID,Raised By,Current Handler,Summary,Priority,Department,Date Raised,SLA Deadline\n';
+        approvalQueueData.forEach(item => {
+          csvData += `${item.id},${item.raisedBy},${item.currentHandler},${item.summary},${item.priority},${item.department},${item.dateRaised},${item.slaDeadline}\n`;
+        });
+        filename = 'approval_queue_report.csv';
+      } else if (type === 'Executive Analytics') {
+        csvData = 'Metric,Value,Status\n';
+        csvData += `Total Tickets,${kpis[0].value},Active\n`;
+        csvData += `Pending Approvals,${kpis[1].value},Pending\n`;
+        csvData += `Tickets Closed This Week,${kpis[2].value},Completed\n`;
+        csvData += `SLA Compliance,${kpis[3].value},Good\n`;
+        csvData += `Avg Resolution Time,${kpis[4].value},On Track\n`;
+        filename = 'executive_analytics.csv';
+      }
+      
+      // Create and download CSV file
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === 'pdf') {
+      // For PDF, we'll create a simple text-based PDF using jsPDF
+      // This is a simplified approach - in production you'd want a proper PDF library
+      const pdfContent = `IT Ticket Management System - ${type}\n\n`;
+      let content = pdfContent;
+      
+      if (type === 'SLA Report') {
+        content += 'Department\tSLA Compliance\tAvg Closure Time\tTickets Breached\tTotal Tickets\n';
+        slaData.forEach(dept => {
+          content += `${dept.department}\t${dept.slaCompliance}%\t${dept.avgClosureTime}\t${dept.ticketsBreached}\t${dept.totalTickets}\n`;
+        });
+      } else if (type === 'Complete Ticket Report') {
+        content += 'Ticket ID\tDepartment\tIssue Type\tPriority\tStatus\tAssigned Level\tSLA Status\tLast Updated\n';
+        ticketData.forEach(ticket => {
+          content += `${ticket.id}\t${ticket.department}\t${ticket.issueType}\t${ticket.priority}\t${ticket.status}\t${ticket.assignedLevel}\t${ticket.slaStatus}\t${ticket.lastUpdated}\n`;
+        });
+      } else if (type === 'Approval Queue Report') {
+        content += 'Ticket ID\tRaised By\tCurrent Handler\tSummary\tPriority\tDepartment\tDate Raised\tSLA Deadline\n';
+        approvalQueueData.forEach(item => {
+          content += `${item.id}\t${item.raisedBy}\t${item.currentHandler}\t${item.summary}\t${item.priority}\t${item.department}\t${item.dateRaised}\t${item.slaDeadline}\n`;
+        });
+      } else if (type === 'Executive Analytics') {
+        content += 'Metric\tValue\tStatus\n';
+        content += `Total Tickets\t${kpis[0].value}\tActive\n`;
+        content += `Pending Approvals\t${kpis[1].value}\tPending\n`;
+        content += `Tickets Closed This Week\t${kpis[2].value}\tCompleted\n`;
+        content += `SLA Compliance\t${kpis[3].value}\tGood\n`;
+        content += `Avg Resolution Time\t${kpis[4].value}\tOn Track\n`;
+      }
+      
+      // Create and download text file as PDF alternative
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${type.toLowerCase().replace(/\s+/g, '_')}.txt`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
     alert(`${type} exported as ${format.toUpperCase()} successfully!`);
   };
 
@@ -407,11 +804,11 @@ const COODashboard = () => {
   const renderDashboard = () => (
     <div className="space-y-8">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <div key={kpi.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
+            <div key={kpi.title} className={`${kpi.cardBgColor} rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">{kpi.title}</p>
@@ -552,6 +949,68 @@ const COODashboard = () => {
     </div>
   );
 
+  // Render Reports and Metrics View
+  const renderReportsAndMetrics = () => (
+    <div className="space-y-8">
+      {/* Department Performance Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Department Performance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {slaData.map((dept) => (
+            <div key={dept.department} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-medium text-gray-900">{dept.department}</h4>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">SLA Compliance:</span>
+                  <span className={`text-sm font-semibold ${
+                    dept.status === 'excellent' ? 'text-green-600' :
+                    dept.status === 'good' ? 'text-blue-600' :
+                    dept.status === 'warning' ? 'text-orange-600' :
+                    'text-gray-600'
+                  }`}>
+                    {dept.status}
+                  </span>
+                  <span className="text-sm font-bold text-gray-900">{dept.slaCompliance}%</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Avg Closure Time:</span>
+                  <span className="ml-2 font-medium text-gray-900">{dept.avgClosureTime}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Tickets Breached:</span>
+                  <span className={`ml-2 font-medium ${
+                    dept.ticketsBreached > 4 ? 'text-red-600' : 'text-gray-900'
+                  }`}>
+                    {dept.ticketsBreached}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Activity Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
+        <div className="space-y-4">
+          {notifications.slice(0, 5).map((notification) => (
+            <div key={notification.id} className="flex items-start space-x-3">
+              <div className="w-2 h-2 rounded-full mt-2 bg-blue-400"></div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-900">{notification.title}</p>
+                <p className="text-sm text-gray-600">{notification.message}</p>
+                <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   // Render SLA Compliance View
   const renderSLACompliance = () => (
     <div className="space-y-8">
@@ -629,7 +1088,7 @@ const COODashboard = () => {
               <Clock className="h-5 w-5 mr-2 text-orange-600" />
               Approval Queue
             </h3>
-            <p className="text-sm text-gray-600 mt-1">{approvalQueue.length} items pending COO approval</p>
+            <p className="text-sm text-gray-600 mt-1">{approvalQueueData.length} items pending COO approval</p>
           </div>
         </div>
 
@@ -646,7 +1105,7 @@ const COODashboard = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {approvalQueue.slice(0, 4).map((item) => (
+              {approvalQueueData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.raisedBy}</td>
@@ -666,11 +1125,11 @@ const COODashboard = () => {
                       <span>Approve</span>
                     </button>
                     <button
-                      onClick={() => handleReject(item.id)}
+                      onClick={() => handleDrop(item.id)}
                       className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-1"
                     >
                       <X className="h-4 w-4" />
-                      <span>Reject</span>
+                      <span>Drop</span>
                     </button>
                   </td>
                 </tr>
@@ -1095,7 +1554,10 @@ const COODashboard = () => {
                       
                       {/* Actions */}
                       <div className="pt-4 border-t border-gray-200 space-y-2">
-                        <button className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => setActiveView('profile')}
+                          className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+                        >
                           <User className="h-4 w-4" />
                           <span>View Full Profile</span>
                         </button>
@@ -1167,7 +1629,7 @@ const COODashboard = () => {
           </div>
 
           {activeView === 'dashboard' && renderDashboard()}
-          {activeView === 'reports' && renderDashboard()}
+          {activeView === 'reports' && renderReportsAndMetrics()}
           {activeView === 'sla' && renderSLACompliance()}
           {activeView === 'approvals' && renderApprovalQueue()}
           {activeView === 'export' && renderExportData()}
@@ -1182,62 +1644,160 @@ const COODashboard = () => {
         onClose={() => setShowTicketModal(false)}
       />
       
-      {/* Approval Details Modal */}
-      {showApprovalDetails && selectedApprovalTicket && (
+      {/* Approval Modal */}
+      {showApproveModal && selectedApprovalTicket && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Approval Details</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Approve Ticket</h3>
               <button
-                onClick={() => setShowApprovalDetails(false)}
+                onClick={() => setShowApproveModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
             
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Ticket ID</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.id}</p>
+            <div className="space-y-6">
+              {/* Ticket Details */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-3">Ticket Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Ticket ID:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Priority:</span>
+                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(selectedApprovalTicket.priority)}`}>
+                      {selectedApprovalTicket.priority}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Raised By:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.raisedBy}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Department:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.department}</span>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Priority</label>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(selectedApprovalTicket.priority)}`}>
-                    {selectedApprovalTicket.priority}
-                  </span>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Raised By</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.raisedBy}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Department</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.department}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Current Handler</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.currentHandler}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date since raised</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.dateRaised}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">SLA Deadline</label>
-                  <p className="text-sm text-gray-900">{selectedApprovalTicket.slaDeadline}</p>
+                <div className="mt-3">
+                  <span className="text-gray-600">Summary:</span>
+                  <p className="text-sm text-gray-900 mt-1">{selectedApprovalTicket.summary}</p>
                 </div>
               </div>
-              
+
+              {/* Approval Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Summary</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedApprovalTicket.summary}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Approval Notes (Optional)
+                </label>
+                <textarea
+                  value={approvalNotes}
+                  onChange={(e) => setApprovalNotes(e.target.value)}
+                  placeholder="Add any notes or comments for this approval..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  rows={4}
+                />
               </div>
-              
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowApproveModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmApproval}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Approve Ticket</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Drop Modal */}
+      {showRejectModal && selectedApprovalTicket && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Drop Ticket</h3>
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Ticket Details */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-3">Ticket Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Ticket ID:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Priority:</span>
+                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(selectedApprovalTicket.priority)}`}>
+                      {selectedApprovalTicket.priority}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Raised By:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.raisedBy}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Department:</span>
+                    <span className="ml-2 font-medium">{selectedApprovalTicket.department}</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="text-gray-600">Summary:</span>
+                  <p className="text-sm text-gray-900 mt-1">{selectedApprovalTicket.summary}</p>
+                </div>
+              </div>
+
+              {/* Drop Reason */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Details</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedApprovalTicket.details}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reason for Dropping <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Please provide a detailed reason for dropping this ticket..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  rows={4}
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">This information will be shared with the requester.</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowRejectModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmDrop}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+                >
+                  <X className="h-4 w-4" />
+                  <span>Drop Ticket</span>
+                </button>
               </div>
             </div>
           </div>
